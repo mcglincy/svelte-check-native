@@ -1892,6 +1892,55 @@ mod tests {
     };
 
     #[test]
+    fn kit_generated_diagnostics_match_upstream_filtering() {
+        let layout = CacheLayout::for_workspace("/ws");
+        let source_path = PathBuf::from("/ws/src/routes/+page.server.ts");
+        let generated_path = layout.kit_overlay_path(&source_path);
+        let source = "export const load = wrapped();";
+        let prefix = "export const load = ";
+        let inserted = ") satisfies import('./$types.js').PageServerLoad";
+        let overlay = format!("{prefix}(wrapped(){inserted};");
+        let start = (prefix.len() + "(wrapped()".len() + 1) as u32;
+        let len = inserted.len() as u32;
+        let maps = HashMap::from([(
+            generated_path.clone(),
+            MapData {
+                overlay_line_starts: svn_emit::compute_line_starts(&overlay),
+                overlay_text: overlay.into(),
+                source_line_starts: svn_emit::compute_line_starts(source),
+                source_text: source.into(),
+                identity_map: true,
+                kit_col_shifts: vec![(1, prefix.len() as u32 + 1, 1), (1, start, len)],
+                ..Default::default()
+            },
+        )]);
+        for (code, column, reported) in [
+            (1360, start + 2, false),
+            (2307, start + 2, true),
+            (2694, start + 2, true),
+            (2355, start + 2, true),
+            (1360, start, true),
+            (1360, start + len, true),
+            (2322, 5, true),
+        ] {
+            let raw = RawDiagnostic {
+                file: generated_path.clone(),
+                line: 1,
+                column,
+                severity: Severity::Error,
+                code,
+                message: "diagnostic".into(),
+                span_length: Some(1),
+            };
+            assert_eq!(
+                map_diagnostic(raw, &layout, &maps, &HashSet::new(), true).is_some(),
+                reported,
+                "code {code} at column {column}",
+            );
+        }
+    }
+
+    #[test]
     fn lexical_normalise_resolves_dot_dot_segments() {
         // Common case: workspace.join(rel_with_dotdot) lands a path that
         // syntactically contains `..` and `.` segments — normalise pops
