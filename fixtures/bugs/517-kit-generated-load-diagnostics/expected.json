@@ -1,0 +1,12 @@
+{
+    "_note": "Suppress the injected load assertion, but retain the same TS1360 error in a user-written satisfies expression.",
+    "errors": [
+        {
+            "file": "+page.server.ts",
+            "line": 2,
+            "column": 59,
+            "code": 1360
+        }
+    ],
+    "warnings": []
+}

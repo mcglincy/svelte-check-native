@@ -1477,6 +1477,16 @@ fn map_diagnostic(
             // positives against synthesized `new $$_C({...})` sites
             // that upstream silently filters.
             let data = map_data.get(&absolute_file)?;
+            if data.identity_map
+                && !matches!(raw.code, 2307 | 2694 | 2355)
+                && data.kit_col_shifts.iter().any(|&(line, column, length)| {
+                    line == raw.line
+                        && raw.column > column
+                        && raw.column < column.saturating_add(length)
+                })
+            {
+                return None;
+            }
             // Ignore-region filter: if the diagnostic's overlay byte
             // position falls inside a `/*svn:ignore_start*/…
             // /*svn:ignore_end*/` region, drop it. Mirrors upstream
