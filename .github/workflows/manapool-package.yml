@@ -30,6 +30,8 @@ jobs:
             platform: win32-x64
             target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.runner }}
+    env:
+      RUSTUP_TOOLCHAIN: 1.97.1
     defaults:
       run:
         shell: bash
