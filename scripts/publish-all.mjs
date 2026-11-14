@@ -20,7 +20,7 @@
 // (`npm whoami` returns a user).
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -46,7 +46,11 @@ if (!targetVersion) {
   console.error(`wrapper package.json missing "version" at ${wrapperDir}`);
   process.exit(1);
 }
-for (const dir of platformDirs) {
+for (const [index, dir] of platformDirs.entries()) {
+  const binary = join(dir, 'bin', TARGETS[index].binName);
+  if (!statSync(binary).isFile() || statSync(binary).size === 0) {
+    throw new Error(`missing or empty platform binary: ${binary}`);
+  }
   const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
   if (pkg.version !== targetVersion) {
     console.error(
@@ -70,7 +74,7 @@ function alreadyPublished(dir) {
   // the stragglers. Skip any package whose target version is already
   // live — this makes the script resumable after a mid-run failure.
   const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
-  const result = spawnSync('npm', ['view', `${pkg.name}@${pkg.version}`, 'version'], {
+  const result = spawnSync('npm', ['view', `${pkg.name}@${pkg.version}`, 'version', ...(pkg.publishConfig?.registry ? ['--registry', pkg.publishConfig.registry] : [])], {
     encoding: 'utf8',
   });
   return result.status === 0 && result.stdout.trim() === pkg.version;

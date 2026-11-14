@@ -1477,6 +1477,7 @@ fn map_diagnostic(
             // positives against synthesized `new $$_C({...})` sites
             // that upstream silently filters.
             let data = map_data.get(&absolute_file)?;
+            // Default svelte-check preserves missing imports, missing exports, and missing returns in Kit insertions.
             if data.identity_map
                 && !matches!(raw.code, 2307 | 2694 | 2355)
                 && data.kit_col_shifts.iter().any(|&(line, column, length)| {
@@ -1902,7 +1903,7 @@ mod tests {
     };
 
     #[test]
-    fn kit_generated_diagnostics_match_upstream_filtering() {
+    fn kit_generated_diagnostics_match_default_svelte_check() {
         let layout = CacheLayout::for_workspace("/ws");
         let source_path = PathBuf::from("/ws/src/routes/+page.server.ts");
         let generated_path = layout.kit_overlay_path(&source_path);

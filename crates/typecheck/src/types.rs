@@ -178,7 +178,7 @@ pub struct CheckInput {
     /// CodeMirror.svelte wrapper pattern.
     pub is_ts_overlay: bool,
     /// Where `kit_inject` spliced annotations into a Kit file, as
-    /// `(1-based line, 0-based UTF-16 column in the overlay, inserted
+    /// `(1-based line, 1-based UTF-16 column in the overlay, inserted
     /// UTF-16 length)`. Diagnostic mapping subtracts these from an
     /// overlay column to recover the user's. Empty for every other
     /// kind, and for Kit files whose overlay is a pure copy.

@@ -14,5 +14,5 @@
         }
     ],
     "warnings": [],
-    "_note": "Matches upstream svelte-check --tsgo: parse errors inside injected Kit annotations are filtered; boundary diagnostics remain."
+    "_note": "Matches default svelte-check and Mana Pool’s patched --tsgo: parse errors inside injected Kit annotations are filtered; boundary diagnostics remain."
 }

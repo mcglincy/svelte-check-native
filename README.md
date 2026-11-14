@@ -1,3 +1,5 @@
+Mana Pool fork: see [local checker and release instructions](./MANAPOOL.md).
+
 <div align="center">
 
   <img src="./svelte-check-native.webp" alt="svelte-check-native" width="300" />
