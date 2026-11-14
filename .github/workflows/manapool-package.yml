@@ -92,3 +92,34 @@ jobs:
           name: npm-${{ matrix.platform }}
           path: dist-packs/*.tgz
           if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.repository == 'manapoolinc/svelte-check-native' && github.ref == 'refs/heads/codex/manapool-package'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: npm-*
+          path: dist-packs
+          merge-multiple: true
+      - name: Extract tested packages
+        run: |
+          node scripts/prepare-manapool-release.mjs
+          for platform in darwin-arm64 darwin-x64 linux-arm64 linux-x64 win32-x64; do
+            tar -xzf dist-packs/manapoolinc-svelte-check-native-$platform-*.tgz --strip-components=1 -C "dist-packs/pkgs/svelte-check-native-$platform"
+          done
+          tar -xzf dist-packs/manapoolinc-svelte-check-native-1*.tgz --strip-components=1 -C dist-packs/pkgs/svelte-check-native
+      - name: Publish platforms then wrapper
+        run: node scripts/publish-all.mjs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

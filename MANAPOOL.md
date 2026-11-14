@@ -8,6 +8,8 @@ Our Kit diagnostic filter suppresses diagnostics strictly inside inserted annota
 
 ## Releasing
 
-The `manapool-package` workflow builds all five platform packages from the same commit and smoke-tests each package with its pinned compiler. Download the `npm-*` artifacts from a successful run into `dist-packs/`. Run `node scripts/prepare-manapool-release.mjs`, extract each platform tarball into its matching directory under `dist-packs/pkgs/`, then run `node scripts/publish-all.mjs --dry-run` and `node scripts/publish-all.mjs`. The publisher sends platform packages first and the wrapper last. Authenticate to `https://npm.pkg.github.com` with package publishing permission.
+The `manapool-package` workflow builds all five platform packages from the same commit, smoke-tests each package with its pinned compiler, then publishes them to GitHub Packages using its repository token. Publishing runs only on `codex/manapool-package` in the Mana Pool fork.
+
+For a manual recovery, download the `npm-*` artifacts from a successful run into `dist-packs/`. Run `node scripts/prepare-manapool-release.mjs`, extract each platform tarball into its matching directory under `dist-packs/pkgs/`, then run `node scripts/publish-all.mjs --dry-run` and `node scripts/publish-all.mjs`. The publisher sends platform packages first and the wrapper last. Authenticate to `https://npm.pkg.github.com` with package publishing permission.
 
 The scoped package version and compiler pin live in `scripts/prepare-manapool-release.mjs`; upstream's Rust version remains unchanged. Update the smoke-test compiler expectation in the workflow when changing the compiler pin.

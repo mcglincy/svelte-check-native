@@ -16,7 +16,7 @@ for (const suffix of ['', ...TARGETS.map(target => `-${target.npmPlatform}`)]) {
   manifest.name = `@manapoolinc/${manifest.name}`;
   manifest.homepage = repository;
   manifest.repository.url = `git+${repository}.git`;
-  manifest.publishConfig = { registry: 'https://npm.pkg.github.com' };
+  manifest.publishConfig = { registry: 'https://npm.pkg.github.com', tag: 'manapool' };
   if (!suffix) {
     manifest.description = 'Mana Pool’s patched svelte-check-native with a pinned TypeScript native compiler.';
     manifest.bugs.url = `${repository}/issues`;
